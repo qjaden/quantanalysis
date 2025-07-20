@@ -31,7 +31,7 @@
 
 ## 📦 安装 Installation
 
-### 从 PyPI 安装 (推荐)
+### 从 PyPI 安装 (暂不支持)
 
 ```bash
 pip install quantanalysis
@@ -45,24 +45,15 @@ cd quantanalysis
 pip install -e .
 ```
 
-### 🎨 中文字体配置 (可选)
+### 🎨 中文字体支持
 
-为获得最佳的中文显示效果，建议下载字体：
+QuantAnalysis 已内置中文字体支持，无需额外配置即可正常显示中文图表。
 
-```bash
-# 自动下载开源中文字体
-python download_fonts.py
+**内置字体：**
+- `SimHei.otf` (黑体)
+- 自动检测系统微软雅黑字体
 
-# 检查字体状态
-python download_fonts.py check
-```
-
-**支持的字体文件：**
-- `SimHei.ttf` (黑体，推荐)
-- `microsoft-yahei.ttf` (微软雅黑)
-- `wqy-zenhei.ttc` (文泉驿正黑)
-
-> 💡 字体文件将自动下载到 `src/quantanalysis/fonts/` 目录
+> 💡 字体文件已集成到安装包中，安装即可使用
 
 ## 🚀 快速开始 Quick Start
 

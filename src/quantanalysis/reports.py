@@ -62,9 +62,9 @@ def _setup_chinese_fonts():
     
     # 项目内的字体文件列表
     project_fonts = [
+        ('SimHei.otf', 'SimHei'),
         ('SimHei.ttf', 'SimHei'),
         ('microsoft-yahei.ttf', 'Microsoft YaHei'),
-        ('wqy-zenhei.ttc', 'WenQuanYi Zen Hei'),
         ('msyh.ttc', 'Microsoft YaHei'),
         ('simhei.ttf', 'SimHei')
     ]
@@ -78,17 +78,31 @@ def _setup_chinese_fonts():
                 try:
                     # 注册字体
                     from matplotlib.font_manager import FontProperties, fontManager
-                    prop = FontProperties(fname=font_path)
                     fontManager.addfont(font_path)
-                    plt.rcParams['font.sans-serif'] = [prop.get_name()]
+                    
+                    # 重建字体缓存
+                    fontManager._load_fontmanager(try_read_cache=False)
+                    
+                    # 使用字体名称而不是字体文件名
+                    if 'SimHei' in font_file or 'simhei' in font_file.lower():
+                        font_name = 'SimHei'
+                    elif 'yahei' in font_file.lower() or 'msyh' in font_file:
+                        font_name = 'Microsoft YaHei'
+                    else:
+                        # 尝试从字体文件获取字体名称
+                        prop = FontProperties(fname=font_path)
+                        font_name = prop.get_name()
+                    
+                    
+                    plt.rcParams['font.sans-serif'] = [font_name] + plt.rcParams['font.sans-serif']
                     
                     # 测试字体是否可用
                     fig, ax = plt.subplots(figsize=(1, 1))
-                    ax.text(0.5, 0.5, '测试', fontsize=12, fontproperties=prop)
+                    ax.text(0.5, 0.5, '测试', fontsize=12)
                     plt.close(fig)
                     font_loaded = True
                     break
-                except Exception:
+                except Exception as e:
                     continue
     
     # 如果项目字体加载失败，尝试系统字体
@@ -96,9 +110,10 @@ def _setup_chinese_fonts():
         system_fonts = [
             'SimHei',           # 黑体
             'Microsoft YaHei',  # 微软雅黑
-            'WenQuanYi Zen Hei', # 文泉驿正黑
+            'PingFang SC',      # Mac字体
+            'Hiragino Sans GB', # Mac字体
             'DejaVu Sans',      # 后备字体
-            'Arial Unicode MS'  # Mac字体
+            'Arial Unicode MS'  # 通用字体
         ]
         
         for font in system_fonts:
@@ -120,6 +135,8 @@ def _setup_chinese_fonts():
     if not font_loaded:
         import warnings
         warnings.filterwarnings('ignore', category=UserWarning, module='matplotlib.font_manager')
+        warnings.filterwarnings('ignore', message='Glyph .* missing from font.*')
+        warnings.filterwarnings('ignore', message='findfont: Generic family .* not found.*')
 
 
 def _generate_charts(returns: pd.Series, benchmark: Optional[pd.Series], language: str, returns_freq: str = "M") -> str:

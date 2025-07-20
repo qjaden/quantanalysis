@@ -54,14 +54,15 @@ def example_basic_analysis():
         language='zh'
     )
     
-    # Calculate individual metrics
+    # Calculate individual metrics using analyze method
+    analysis = analyzer.analyze(returns)
     print("主要指标:")
-    print(f"总收益: {analyzer.calculate_sharpe(returns):.2f}")
-    print(f"夏普比率: {analyzer.calculate_sharpe(returns):.2f}")
-    print(f"索提诺比率: {analyzer.calculate_sortino(returns):.2f}")
-    print(f"最大回撤: {analyzer.calculate_max_drawdown(returns):.2%}")
-    print(f"复合年增长率: {analyzer.calculate_cagr(returns):.2%}")
-    print(f"年化波动率: {analyzer.calculate_volatility(returns):.2%}")
+    print(f"总收益: {analysis['returns_stats']['total_return']:.2%}")
+    print(f"夏普比率: {analysis['performance_metrics']['sharpe']:.2f}")
+    print(f"索提诺比率: {analysis['performance_metrics']['sortino']:.2f}")
+    print(f"最大回撤: {analysis['risk_metrics']['max_drawdown']:.2%}")
+    print(f"复合年增长率: {analysis['returns_stats']['cagr']:.2%}")
+    print(f"年化波动率: {analysis['risk_metrics']['volatility']:.2%}")
     print()
 
 
@@ -127,14 +128,15 @@ def example_english_analysis():
         language='en'
     )
     
-    # Calculate key metrics
+    # Calculate key metrics using analyze method
+    analysis = analyzer.analyze(returns)
     print("Key Metrics:")
-    print(f"Total Return: {(1 + returns).prod() - 1:.2%}")
-    print(f"Sharpe Ratio: {analyzer.calculate_sharpe(returns):.2f}")
-    print(f"Sortino Ratio: {analyzer.calculate_sortino(returns):.2f}")
-    print(f"Max Drawdown: {analyzer.calculate_max_drawdown(returns):.2%}")
-    print(f"CAGR: {analyzer.calculate_cagr(returns):.2%}")
-    print(f"Volatility: {analyzer.calculate_volatility(returns):.2%}")
+    print(f"Total Return: {analysis['returns_stats']['total_return']:.2%}")
+    print(f"Sharpe Ratio: {analysis['performance_metrics']['sharpe']:.2f}")
+    print(f"Sortino Ratio: {analysis['performance_metrics']['sortino']:.2f}")
+    print(f"Max Drawdown: {analysis['risk_metrics']['max_drawdown']:.2%}")
+    print(f"CAGR: {analysis['returns_stats']['cagr']:.2%}")
+    print(f"Volatility: {analysis['risk_metrics']['volatility']:.2%}")
     print()
 
 
@@ -170,6 +172,5 @@ if __name__ == "__main__":
     example_convenience_function()
     
     print("所有示例运行完成！")
-    print("\n要在 Jupyter Notebook 中查看完整的交互式报告，请使用:")
-    print("analyzer.create_dashboard(returns, benchmark)")
-    print("analyzer.generate_report(returns, benchmark)")
+    print("\n要查看HTML报告，请使用:")
+    print("analyzer.generate_report(returns, benchmark, output='report.html')")

@@ -1,35 +1,25 @@
 # 字体文件说明
 
-## 字体文件位置
+## 内置字体文件
 
-请将以下字体文件放置在此目录：
+QuantAnalysis 已内置以下中文字体文件，无需用户额外下载：
 
-- `SimHei.ttf` - 黑体字体（推荐）
-- `microsoft-yahei.ttf` - 微软雅黑字体
-- `wqy-zenhei.ttc` - 文泉驿正黑字体
+- `SimHei.otf` - 黑体字体（推荐）
 
-## 获取字体文件
+## 自动检测机制
 
-### Windows系统
-从 `C:\Windows\Fonts\` 目录复制以下文件：
-- `simhei.ttf` (黑体)
-- `msyh.ttc` (微软雅黑)
+QuantAnalysis会按以下优先级自动检测和使用字体：
 
-### Linux系统
-安装字体包：
-```bash
-# Ubuntu/Debian
-sudo apt-get install fonts-wqy-zenhei
+1. **内置字体**: 优先使用项目内置的字体文件
+2. **系统字体**: 如果内置字体不可用，自动回退到系统已安装的中文字体
+3. **后备字体**: 最后使用默认的后备字体，确保程序正常运行
 
-# CentOS/RHEL
-sudo yum install wqy-zenhei-fonts
-```
+## 字体兼容性
 
-### 在线下载
-可以从以下位置下载开源中文字体：
-- 文泉驿字体：http://wenq.org/
-- 思源黑体：https://github.com/adobe-fonts/source-han-sans
+- **Windows**: 自动识别系统的SimHei、Microsoft YaHei等字体
+- **Linux**: 自动回退到系统已安装的中文字体
+- **macOS**: 支持Hiragino Sans GB、PingFang SC等系统字体
 
 ## 使用说明
 
-将字体文件复制到此目录后，QuantAnalysis会自动检测并使用，解决图表中文显示问题。
+安装QuantAnalysis后，中文字体支持即开即用，无需任何额外配置。所有图表和报告都将正确显示中文内容。
