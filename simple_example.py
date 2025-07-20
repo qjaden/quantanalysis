@@ -41,7 +41,7 @@ def main():
     print("2. 创建分析器...")
     analyzer = QuantAnalysis(
         risk_free_rate=0.03,  # 3% 无风险收益率
-        language='zh'         # 中文界面
+        language='en'         # 中文界面
     )
     print("   分析器配置完成\n")
     

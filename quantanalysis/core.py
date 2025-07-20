@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 
 from . import stats, utils, reports
+from .i18n import set_language, get_language, t
 
 
 class QuantAnalysis:
@@ -29,6 +30,9 @@ class QuantAnalysis:
         self.risk_free_rate = risk_free_rate
         self.language = language
         self.periods_per_year = periods_per_year
+        
+        # Set global language for i18n
+        set_language(language)
     
     def analyze(
         self,
@@ -148,12 +152,15 @@ class QuantAnalysis:
         # 执行分析
         metrics = self.analyze(returns, benchmark)
         
+        # 确保语言设置正确
+        set_language(self.language)
+        
         # 生成报告
         return reports.generate_html_report(
             returns=returns,
             benchmark=benchmark,
             metrics=metrics,
-            title=title or ("投资组合分析报告" if self.language == "zh" else "Portfolio Analysis Report"),
+            title=title or t("report.title"),
             language=self.language,
             config={
                 'risk_free_rate': self.risk_free_rate,
@@ -165,7 +172,7 @@ class QuantAnalysis:
     def _prepare_returns(self, returns: pd.Series) -> pd.Series:
         """预处理收益率数据"""
         if not isinstance(returns, pd.Series):
-            raise TypeError("收益率必须是pandas Series")
+            raise TypeError(t("errors.invalid_returns"))
         
         # 移除NaN值
         returns = returns.dropna()
@@ -175,6 +182,23 @@ class QuantAnalysis:
             try:
                 returns.index = pd.to_datetime(returns.index)
             except:
-                raise ValueError("收益率索引必须是日期格式")
+                raise ValueError(t("errors.invalid_date_index"))
         
         return returns
+    
+    def set_language(self, language: str) -> None:
+        """Set analysis language
+        
+        Args:
+            language: Language code ('zh' for Chinese, 'en' for English)
+        """
+        self.language = language
+        set_language(language)
+    
+    def get_language(self) -> str:
+        """Get current analysis language
+        
+        Returns:
+            Current language code
+        """
+        return self.language

@@ -12,8 +12,9 @@ except ImportError:
 
 from .core import QuantAnalysis
 from . import stats, utils
+from .i18n import set_language, get_language, get_supported_languages
 
-__all__ = ["QuantAnalysis", "stats", "utils", "__version__"]
+__all__ = ["QuantAnalysis", "stats", "utils", "set_language", "get_language", "get_supported_languages", "__version__"]
 
 
 def create_analyzer(

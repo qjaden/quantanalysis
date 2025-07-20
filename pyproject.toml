@@ -38,6 +38,7 @@ dependencies = [
     "matplotlib>=3.5.0",
     "scipy>=1.7.0",
     "python-dateutil>=2.8.0",
+    "babel>=2.12.0",
 ]
 
 [project.optional-dependencies]
@@ -63,10 +64,10 @@ Documentation = "https://quantanalysis.readthedocs.io"
 Issues = "https://github.com/yourusername/quantanalysis/issues"
 
 [tool.setuptools_scm]
-write_to = "src/quantanalysis/_version.py"
+write_to = "quantanalysis/_version.py"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
 
 [tool.setuptools.package-data]
 "quantanalysis" = ["fonts/*", "*.html"]

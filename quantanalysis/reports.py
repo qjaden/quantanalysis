@@ -11,6 +11,7 @@ import os
 from typing import Dict, Any, Optional
 
 from . import stats
+from .i18n import t, get_language, set_language
 
 
 def generate_html_report(
@@ -37,6 +38,9 @@ def generate_html_report(
         生成的HTML文件路径
     """
     config = config or {}
+    
+    # 确保当前上下文中的语言设置正确
+    set_language(language)
     
     # 生成图表
     charts_base64 = _generate_charts(returns, benchmark, language, returns_freq)
@@ -183,26 +187,26 @@ def _generate_charts(returns: pd.Series, benchmark: Optional[pd.Series], languag
         'grid.linewidth': 0.5
     })
     
-    # 中文标签
+    # Get labels from i18n
     labels = {
-        'cumulative_returns': '累计收益对比' if language == 'zh' else 'Cumulative Returns',
-        'drawdown': '回撤分析' if language == 'zh' else 'Drawdown Analysis', 
-        'monthly_heatmap': '月度收益热力图' if language == 'zh' else 'Monthly Returns Heatmap',
-        'return_distribution': '收益率分布' if language == 'zh' else 'Return Distribution',
-        'returns_bar': '收益率柱状图' if language == 'zh' else 'Returns Bar Chart',
-        'portfolio': '投资组合' if language == 'zh' else 'Portfolio',
-        'benchmark': '基准' if language == 'zh' else 'Benchmark',
-        'drawdown_label': '回撤' if language == 'zh' else 'Drawdown',
-        'daily_return': '日收益率' if language == 'zh' else 'Daily Return',
-        'frequency': '频次' if language == 'zh' else 'Frequency',
-        'mean': '均值' if language == 'zh' else 'Mean'
+        'cumulative_returns': t('charts.cumulative_returns'),
+        'drawdown': t('charts.drawdown'), 
+        'monthly_heatmap': t('charts.monthly_heatmap'),
+        'return_distribution': t('charts.return_distribution'),
+        'returns_bar': t('charts.returns_bar'),
+        'portfolio': t('common.portfolio'),
+        'benchmark': t('common.benchmark'),
+        'drawdown_label': t('charts.drawdown_label'),
+        'daily_return': t('charts.daily_return'),
+        'frequency': t('charts.frequency'),
+        'mean': t('charts.mean')
     }
     
     # 频率标签
     freq_labels = {
-        'D': '日频收益率' if language == 'zh' else 'Daily Returns',
-        'W': '周频收益率' if language == 'zh' else 'Weekly Returns', 
-        'M': '月频收益率' if language == 'zh' else 'Monthly Returns'
+        'D': t('charts.daily_returns'),
+        'W': t('charts.weekly_returns'), 
+        'M': t('charts.monthly_returns')
     }
     
     # 1. 累计收益图 - Apple风格 (左上)
@@ -284,10 +288,7 @@ def _generate_charts(returns: pd.Series, benchmark: Optional[pd.Series], languag
                                ha='center', va='center', fontsize=8, color=text_color, fontweight='500')
             
             ax3.set_xticks(range(12))
-            ax3.set_xticklabels(['1月', '2月', '3月', '4月', '5月', '6月',
-                               '7月', '8月', '9月', '10月', '11月', '12月'] if language == 'zh'
-                              else ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+            ax3.set_xticklabels(t('months.short'))
             ax3.set_yticks(range(len(years)))
             ax3.set_yticklabels(years)
             ax3.tick_params(colors=colors['text'])
@@ -296,7 +297,7 @@ def _generate_charts(returns: pd.Series, benchmark: Optional[pd.Series], languag
             cbar = plt.colorbar(im, ax=ax3, shrink=0.8, format=plt.FuncFormatter(lambda x, _: f'{x:.1%}'))
             cbar.ax.tick_params(colors=colors['text'])
     except:
-        ax3.text(0.5, 0.5, '数据不足' if language == 'zh' else 'Insufficient Data', 
+        ax3.text(0.5, 0.5, t('report.insufficient_data'), 
                 ha='center', va='center', transform=ax3.transAxes, fontsize=12, color=colors['text'])
     
     ax3.set_title(labels['monthly_heatmap'], fontsize=14, fontweight='normal', pad=20, color=colors['text'])
@@ -429,7 +430,7 @@ def _create_returns_bar_chart(ax, returns: pd.Series, freq: str, freq_labels: di
         
     except Exception as e:
         # 如果出错，显示错误信息
-        ax.text(0.5, 0.5, f'数据处理错误: {str(e)}' if language == 'zh' else f'Data Error: {str(e)}', 
+        ax.text(0.5, 0.5, f'{t("report.data_error")}: {str(e)}', 
                 ha='center', va='center', transform=ax.transAxes, fontsize=12, color=colors['text'])
         ax.set_title(freq_labels.get(freq, freq_labels['M']), fontsize=14, fontweight='normal', pad=20, color=colors['text'])
 
@@ -444,29 +445,29 @@ def _create_html_content(
 ) -> str:
     """创建完整的HTML内容"""
     
-    # 中文翻译
-    t = {
-        'performance_summary': '业绩概览' if language == 'zh' else 'Performance Summary',
-        'analysis_period': '分析期间' if language == 'zh' else 'Analysis Period',
-        'generated_on': '生成时间' if language == 'zh' else 'Generated on',
-        'total_return': '总收益率' if language == 'zh' else 'Total Return',
-        'cagr': '复合年增长率' if language == 'zh' else 'CAGR',
-        'sharpe_ratio': '夏普比率' if language == 'zh' else 'Sharpe Ratio',
-        'max_drawdown': '最大回撤' if language == 'zh' else 'Max Drawdown',
-        'volatility': '年化波动率' if language == 'zh' else 'Volatility',
-        'sortino_ratio': '索提诺比率' if language == 'zh' else 'Sortino Ratio',
-        'detailed_metrics': '详细指标' if language == 'zh' else 'Detailed Metrics',
-        'metric': '指标' if language == 'zh' else 'Metric',
-        'value': '数值' if language == 'zh' else 'Value',
-        'risk_metrics': '风险指标' if language == 'zh' else 'Risk Metrics',
-        'performance_metrics': '绩效指标' if language == 'zh' else 'Performance Metrics',
-        'chart_analysis': '图表分析' if language == 'zh' else 'Chart Analysis',
-        'var_95': '95% VaR' if language == 'zh' else '95% VaR',
-        'cvar_95': '95% CVaR' if language == 'zh' else '95% CVaR',
-        'calmar_ratio': '卡玛比率' if language == 'zh' else 'Calmar Ratio',
-        'omega_ratio': '欧米茄比率' if language == 'zh' else 'Omega Ratio',
-        'recovery_factor': '恢复因子' if language == 'zh' else 'Recovery Factor',
-        'generated_by': '本报告由 QuantAnalysis 系统生成' if language == 'zh' else 'Generated by QuantAnalysis System'
+    # Get translations from i18n system
+    translations = {
+        'performance_summary': t('categories.performance_summary'),
+        'analysis_period': t('report.analysis_period'),
+        'generated_on': t('common.generated_on'),
+        'total_return': t('metrics.total_return'),
+        'cagr': t('metrics.cagr'),
+        'sharpe_ratio': t('metrics.sharpe_ratio'),
+        'max_drawdown': t('metrics.max_drawdown'),
+        'volatility': t('metrics.volatility'),
+        'sortino_ratio': t('metrics.sortino_ratio'),
+        'detailed_metrics': t('report.detailed_metrics'),
+        'metric': t('common.metric'),
+        'value': t('common.value'),
+        'risk_metrics': t('categories.risk_metrics'),
+        'performance_metrics': t('categories.performance_metrics'),
+        'chart_analysis': t('report.chart_analysis'),
+        'var_95': t('metrics.var_95'),
+        'cvar_95': t('metrics.cvar_95'),
+        'calmar_ratio': t('metrics.calmar_ratio'),
+        'omega_ratio': t('metrics.omega_ratio'),
+        'recovery_factor': t('metrics.recovery_factor'),
+        'generated_by': t('report.generated_by')
     }
     
     # 计算期间信息
@@ -788,91 +789,91 @@ def _create_html_content(
         <div class="container">
             <div class="header">
                 <h1>{title}</h1>
-                <p class="header-info">{t['analysis_period']}: {start_date} 至 {end_date}</p>
-                <p class="header-info">交易日数: {trading_days} 天 | {t['generated_on']}: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+                <p class="header-info">{translations['analysis_period']}: {start_date} {t('common.to')} {end_date}</p>
+                <p class="header-info">{t('common.trading_days')}: {trading_days} {t('common.days')} | {translations['generated_on']}: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
             </div>
             
             <div class="content">
                 <div class="section">
-                    <h2>📊 {t['performance_summary']}</h2>
+                    <h2>📊 {translations['performance_summary']}</h2>
                     <div class="metrics-grid">
                         <div class="metric-card {'positive' if metrics['returns_stats']['total_return'] > 0 else 'negative'}">
-                            <div class="metric-title">{t['total_return']}</div>
+                            <div class="metric-title">{translations['total_return']}</div>
                             <div class="metric-value {'positive' if metrics['returns_stats']['total_return'] > 0 else 'negative'}">{metrics['returns_stats']['total_return']:.2%}</div>
                         </div>
                         
                         <div class="metric-card {'positive' if metrics['returns_stats']['cagr'] > 0 else 'negative'}">
-                            <div class="metric-title">{t['cagr']}</div>
+                            <div class="metric-title">{translations['cagr']}</div>
                             <div class="metric-value {'positive' if metrics['returns_stats']['cagr'] > 0 else 'negative'}">{metrics['returns_stats']['cagr']:.2%}</div>
                         </div>
                         
                         <div class="metric-card {'positive' if metrics['performance_metrics']['sharpe'] > 1 else 'negative' if metrics['performance_metrics']['sharpe'] < 0 else ''}">
-                            <div class="metric-title">{t['sharpe_ratio']}</div>
+                            <div class="metric-title">{translations['sharpe_ratio']}</div>
                             <div class="metric-value">{metrics['performance_metrics']['sharpe']:.3f}</div>
                         </div>
                         
                         <div class="metric-card negative">
-                            <div class="metric-title">{t['max_drawdown']}</div>
+                            <div class="metric-title">{translations['max_drawdown']}</div>
                             <div class="metric-value negative">{metrics['risk_metrics']['max_drawdown']:.2%}</div>
                         </div>
                         
                         <div class="metric-card">
-                            <div class="metric-title">{t['volatility']}</div>
+                            <div class="metric-title">{translations['volatility']}</div>
                             <div class="metric-value">{metrics['risk_metrics']['volatility']:.2%}</div>
                         </div>
                         
                         <div class="metric-card {'positive' if metrics['performance_metrics']['sortino'] > 1 else 'negative' if metrics['performance_metrics']['sortino'] < 0 else ''}">
-                            <div class="metric-title">{t['sortino_ratio']}</div>
+                            <div class="metric-title">{translations['sortino_ratio']}</div>
                             <div class="metric-value">{metrics['performance_metrics']['sortino']:.3f}</div>
                         </div>
                     </div>
                 </div>
                 
                 <div class="section">
-                    <h2>📈 {t['chart_analysis']}</h2>
+                    <h2>📈 {translations['chart_analysis']}</h2>
                     <div class="chart-container">
-                        <img src="data:image/png;base64,{charts_base64}" alt="投资组合分析图表">
+                        <img src="data:image/png;base64,{charts_base64}" alt="{t('common.portfolio')}{t('common.analysis')}{t('charts.cumulative_returns')}">
                     </div>
                 </div>
                 
                 <div class="section">
-                    <h2>📋 {t['detailed_metrics']}</h2>
+                    <h2>📋 {translations['detailed_metrics']}</h2>
                     <table class="metrics-table">
                         <thead>
                             <tr>
-                                <th>{t['metric']}</th>
-                                <th>{t['value']}</th>
+                                <th>{translations['metric']}</th>
+                                <th>{translations['value']}</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr><td colspan="2" class="category-header">{t['risk_metrics']}</td></tr>
-                            <tr><td>{t['volatility']}</td><td>{metrics['risk_metrics']['volatility']:.2%}</td></tr>
-                            <tr><td>{t['max_drawdown']}</td><td>{metrics['risk_metrics']['max_drawdown']:.2%}</td></tr>
-                            <tr><td>{t['var_95']}</td><td>{metrics['risk_metrics']['var_95']:.3%}</td></tr>
-                            <tr><td>{t['cvar_95']}</td><td>{metrics['risk_metrics']['cvar_95']:.3%}</td></tr>
-                            <tr><td>溃疡指数</td><td>{metrics['risk_metrics']['ulcer_index']:.4f}</td></tr>
+                            <tr><td colspan="2" class="category-header">{translations['risk_metrics']}</td></tr>
+                            <tr><td>{translations['volatility']}</td><td>{metrics['risk_metrics']['volatility']:.2%}</td></tr>
+                            <tr><td>{translations['max_drawdown']}</td><td>{metrics['risk_metrics']['max_drawdown']:.2%}</td></tr>
+                            <tr><td>{translations['var_95']}</td><td>{metrics['risk_metrics']['var_95']:.3%}</td></tr>
+                            <tr><td>{translations['cvar_95']}</td><td>{metrics['risk_metrics']['cvar_95']:.3%}</td></tr>
+                            <tr><td>{t('metrics.ulcer_index')}</td><td>{metrics['risk_metrics']['ulcer_index']:.4f}</td></tr>
                             
-                            <tr><td colspan="2" class="category-header">{t['performance_metrics']}</td></tr>
-                            <tr><td>{t['sharpe_ratio']}</td><td>{metrics['performance_metrics']['sharpe']:.3f}</td></tr>
-                            <tr><td>{t['sortino_ratio']}</td><td>{metrics['performance_metrics']['sortino']:.3f}</td></tr>
-                            <tr><td>{t['calmar_ratio']}</td><td>{metrics['performance_metrics']['calmar']:.3f}</td></tr>
-                            <tr><td>{t['omega_ratio']}</td><td>{metrics['performance_metrics']['omega']:.3f}</td></tr>
-                            <tr><td>{t['recovery_factor']}</td><td>{metrics['drawdown_metrics']['recovery_factor']:.3f}</td></tr>
+                            <tr><td colspan="2" class="category-header">{translations['performance_metrics']}</td></tr>
+                            <tr><td>{translations['sharpe_ratio']}</td><td>{metrics['performance_metrics']['sharpe']:.3f}</td></tr>
+                            <tr><td>{translations['sortino_ratio']}</td><td>{metrics['performance_metrics']['sortino']:.3f}</td></tr>
+                            <tr><td>{translations['calmar_ratio']}</td><td>{metrics['performance_metrics']['calmar']:.3f}</td></tr>
+                            <tr><td>{translations['omega_ratio']}</td><td>{metrics['performance_metrics']['omega']:.3f}</td></tr>
+                            <tr><td>{translations['recovery_factor']}</td><td>{metrics['drawdown_metrics']['recovery_factor']:.3f}</td></tr>
     """
     
     # 如果有基准比较，添加相对指标
     if 'relative_metrics' in metrics:
         html_content += f"""
-                            <tr><td colspan="2" class="category-header">相对基准指标</td></tr>
-                            <tr><td>超额收益</td><td>{metrics['relative_metrics']['excess_return']:.2%}</td></tr>
-                            <tr><td>跟踪误差</td><td>{metrics['relative_metrics']['tracking_error']:.2%}</td></tr>
-                            <tr><td>信息比率</td><td>{metrics['relative_metrics']['information_ratio']:.3f}</td></tr>
+                            <tr><td colspan="2" class="category-header">{t('categories.relative_metrics')}</td></tr>
+                            <tr><td>{t('metrics.excess_return')}</td><td>{metrics['relative_metrics']['excess_return']:.2%}</td></tr>
+                            <tr><td>{t('metrics.tracking_error')}</td><td>{metrics['relative_metrics']['tracking_error']:.2%}</td></tr>
+                            <tr><td>{t('metrics.information_ratio')}</td><td>{metrics['relative_metrics']['information_ratio']:.3f}</td></tr>
         """
         
         if 'alpha' in metrics['performance_metrics']:
             html_content += f"""
-                            <tr><td>阿尔法</td><td>{metrics['performance_metrics']['alpha']:.3%}</td></tr>
-                            <tr><td>贝塔</td><td>{metrics['performance_metrics']['beta']:.3f}</td></tr>
+                            <tr><td>{t('metrics.alpha')}</td><td>{metrics['performance_metrics']['alpha']:.3%}</td></tr>
+                            <tr><td>{t('metrics.beta')}</td><td>{metrics['performance_metrics']['beta']:.3f}</td></tr>
             """
     
     html_content += f"""
@@ -882,8 +883,8 @@ def _create_html_content(
             </div>
             
             <div class="footer">
-                <p>{t['generated_by']}</p>
-                <p>{t['generated_on']}: {datetime.now().strftime('%Y年%m月%d日 %H:%M:%S')}</p>
+                <p>{translations['generated_by']}</p>
+                <p>{translations['generated_on']}: {datetime.now().strftime('%Y年%m月%d日 %H:%M:%S' if get_language() == 'zh' else '%Y-%m-%d %H:%M:%S')}</p>
             </div>
         </div>
     </body>
